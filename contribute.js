@@ -714,6 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let branchRes;
         let retryCount = 0;
         let created = false;
+        let lastBranchError = '';
         
         while (retryCount < 5 && !created) {
             branchRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/refs`, {
@@ -726,6 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 created = true;
             } else {
                 const txt = await branchRes.text();
+                lastBranchError = txt;
                 if (txt.includes('already exists')) {
                     created = true;
                 } else {
@@ -736,7 +738,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (!created) {
-            throw new Error(`Failed to create the work branch on your fork after multiple retries. GitHub may still be provisioning your fork. Please try again.`);
+            throw new Error(`Failed to create branch: ${lastBranchError}`);
         }
 
         return forkOwner;
