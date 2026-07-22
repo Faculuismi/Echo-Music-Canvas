@@ -687,13 +687,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateLoadingMessage('Creating Work Branch', 'Creating a separate branch for your canvas…');
-        const refRes = await fetch(`${GITHUB_API_URL}/repos/${TARGET_OWNER}/${TARGET_REPO}/git/ref/heads/main`, {
-            headers: buildHeaders()
-        });
-        if (!refRes.ok) throw new Error('Failed to get the latest commit SHA of upstream main.');
+        
+        let refRes;
+        let mainSha;
+        let refRetryCount = 0;
+        let refFound = false;
 
-        const refData  = await refRes.json();
-        const mainSha  = refData.object.sha;
+        while (refRetryCount < 6 && !refFound) {
+            refRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/ref/heads/main`, {
+                headers: buildHeaders()
+            });
+            
+            if (refRes.ok) {
+                const refData = await refRes.json();
+                mainSha = refData.object.sha;
+                refFound = true;
+            } else {
+                refRetryCount++;
+                await sleep(2000);
+            }
+        }
+        
+        if (!refFound) throw new Error('Failed to get the latest commit SHA of your fork after multiple retries. GitHub is still provisioning your fork.');
+
 
         let branchRes;
         let retryCount = 0;
