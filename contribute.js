@@ -624,10 +624,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const primaryEntry = entries[0]; 
         const sanitizedOriginalName = selectedFile.name.toLowerCase().replace(/[^a-z0-9._-]/g, '_');
         const cleanName    = sanitizedOriginalName.split('.')[0];
-        const newFilename  = `${gitHubUsername.toLowerCase()}-${sanitizedOriginalName}`;
+        const newFilename  = `${gitHubUsername.toLowerCase()}-${Date.now()}-${sanitizedOriginalName}`;
         const targetPath   = `${destDir}/${newFilename}`;
         const canvasUrl    = `https://canvas.echomusic.fun/${targetPath}`;
-        const branchName   = `canvas-${gitHubUsername.toLowerCase()}-${cleanName}`;
+        const branchName   = `canvas-${gitHubUsername.toLowerCase()}-${cleanName}-${Date.now()}`;
 
         const forkOwner = await forkAndSync(branchName, primaryEntry.song);
 
@@ -653,7 +653,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function submitWithExistingCanvas(entries, destDir) {
         const primaryEntry = entries[0];
         const slug        = primaryEntry.song.toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 30);
-        const branchName  = `canvas-${gitHubUsername.toLowerCase()}-${slug}-link`;
+        const branchName  = `canvas-${gitHubUsername.toLowerCase()}-${slug}-link-${Date.now()}`;
 
         const forkOwner = await forkAndSync(branchName, primaryEntry.song);
 
@@ -709,41 +709,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function updateCanvasJson(forkOwner, branchName, entries, canvasVideoUrl) {
-        updateLoadingMessage('Updating Database', `Adding ${entries.length} song entr${entries.length === 1 ? 'y' : 'ies'} to canvas.json…`);
-
-        const canvasApiUrl = `${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/contents/canvas.json?ref=${branchName}`;
-        const canvasRes = await fetch(canvasApiUrl, { headers: buildHeaders() });
-        if (!canvasRes.ok) throw new Error('Failed to download canvas.json from your fork.');
-
-        const canvasData    = await canvasRes.json();
-        const canvasSha     = canvasData.sha;
-        const canvasContent = decodeBase64Utf8(canvasData.content);
-        const canvasObj     = JSON.parse(canvasContent);
-
-        if (!canvasObj.items || !Array.isArray(canvasObj.items)) {
-            throw new Error('canvas.json items database is missing or corrupt.');
-        }
+        updateLoadingMessage('Submitting to Database', `Adding ${entries.length} song entr${entries.length === 1 ? 'y' : 'ies'} to submission pool…`);
 
         const newEntries = entries.map(entry => ({
             song:   entry.song,
             artist: entry.artist,
             url:    canvasVideoUrl
         }));
-        canvasObj.items.unshift(...newEntries);
 
-        const updatedContent = encodeBase64Utf8(JSON.stringify(canvasObj, null, 2) + '\n');
+        const submissionFilename = `submissions/${gitHubUsername.toLowerCase()}-${Date.now()}.json`;
+        const updatedContent = encodeBase64Utf8(JSON.stringify(newEntries, null, 2) + '\n');
 
-        const updateRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/contents/canvas.json`, {
+        const updateRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/contents/${submissionFilename}`, {
             method: 'PUT',
             headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                message: `feat: update canvas.json — add ${entries.length} song(s)`,
+                message: `feat: add canvas submission for ${entries.length} song(s)`,
                 content: updatedContent,
-                sha:     canvasSha,
                 branch:  branchName
             })
         });
-        if (!updateRes.ok) throw new Error('Failed to write updated canvas.json to your fork.');
+        if (!updateRes.ok) throw new Error('Failed to write submission file to your fork.');
     }
 
     async function openPullRequest(forkOwner, branchName, entries, destDir, canvasPath) {
