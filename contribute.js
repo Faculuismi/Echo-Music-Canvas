@@ -693,7 +693,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let refRetryCount = 0;
         let refFound = false;
 
-        while (refRetryCount < 6 && !refFound) {
+        while (refRetryCount < 20 && !refFound) {
+            updateLoadingMessage('Creating Work Branch', `Waiting for GitHub to provision your fork... (Attempt ${refRetryCount + 1}/20)`);
             refRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/ref/heads/main`, {
                 headers: buildHeaders()
             });
@@ -708,7 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        if (!refFound) throw new Error('Failed to get the latest commit SHA of your fork after multiple retries. GitHub is still provisioning your fork.');
+        if (!refFound) throw new Error('Failed to get the latest commit SHA of your fork after multiple retries. GitHub is taking too long to provision your fork. Please refresh the page and try again in a minute.');
 
 
         let branchRes;
