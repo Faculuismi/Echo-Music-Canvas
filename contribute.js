@@ -687,22 +687,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateLoadingMessage('Creating Work Branch', 'Creating a separate branch for your canvas…');
-        const refRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/ref/heads/main`, {
+        const refRes = await fetch(`${GITHUB_API_URL}/repos/${TARGET_OWNER}/${TARGET_REPO}/git/ref/heads/main`, {
             headers: buildHeaders()
         });
-        if (!refRes.ok) throw new Error('Failed to get the latest commit SHA of main.');
+        if (!refRes.ok) throw new Error('Failed to get the latest commit SHA of upstream main.');
 
         const refData  = await refRes.json();
         const mainSha  = refData.object.sha;
 
-        const branchRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/refs`, {
-            method: 'POST',
-            headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ref: `refs/heads/${branchName}`, sha: mainSha })
-        });
-        if (!branchRes.ok) {
-            const txt = await branchRes.text();
-            if (!txt.includes('already exists')) throw new Error('Failed to create branch: ' + txt);
+        let branchRes;
+        let retryCount = 0;
+        let created = false;
+        
+        while (retryCount < 5 && !created) {
+            branchRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/refs`, {
+                method: 'POST',
+                headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ref: `refs/heads/${branchName}`, sha: mainSha })
+            });
+            
+            if (branchRes.ok) {
+                created = true;
+            } else {
+                const txt = await branchRes.text();
+                if (txt.includes('already exists')) {
+                    created = true;
+                } else {
+                    retryCount++;
+                    await sleep(2000);
+                }
+            }
+        }
+        
+        if (!created) {
+            throw new Error(`Failed to create the work branch on your fork after multiple retries. GitHub may still be provisioning your fork. Please try again.`);
         }
 
         return forkOwner;
