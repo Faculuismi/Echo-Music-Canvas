@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - 'submissions/**'
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
 
 permissions:
   contents: write
