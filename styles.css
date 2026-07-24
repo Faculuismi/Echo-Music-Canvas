@@ -1049,11 +1049,12 @@ body {
     width: 100%;
     padding: 14px 16px 14px 44px;
     border-radius: var(--border-radius-pill);
-    border: 2px solid transparent;
-    background: var(--btn-gray);
+    border: 2px solid #e5e7eb;
+    background: #fff;
     font-size: 1rem;
     transition: var(--transition);
     outline: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 #existing-search:focus, .song-api-search:focus {
     border-color: var(--accent);
@@ -1168,10 +1169,12 @@ body {
     padding: 14px 16px;
     border-radius: var(--border-radius-pill);
     border: 2px solid transparent;
-    background: #fff;
+    background: #f9f9f9;
+    color: var(--text-dim);
     font-size: 0.95rem;
     transition: var(--transition);
     outline: none;
+    pointer-events: none;
 }
 .song-entry-song:focus, .song-entry-artist:focus {
     border-color: var(--accent);
