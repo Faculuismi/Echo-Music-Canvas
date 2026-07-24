@@ -5,41 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#121212">
-    <title>Echo Music Canvas Hub - Custom Motion Visualizers</title>
-    <meta name="description" content="Discover, search, and submit custom vertical background visualizers and music video loops for the Echo Music App. Browse our active canvas database.">
+    <meta name="theme-color" content="#ffffff">
+    <title>Echo Music Canvas Hub</title>
+    <meta name="description" content="Discover, search, and submit custom vertical background visualizers and music video loops for the Echo Music App.">
     <meta name="keywords" content="Echo Music, Canvas, Music App, Background visualizers, custom canvas, music video loops, Spotify Canvas clone, vertical visualizer, M3U8, MP4">
     <link rel="canonical" href="https://canvas.echomusic.fun/">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://canvas.echomusic.fun/">
-    <meta property="og:title" content="Echo Music Canvas Hub - Custom Motion Visualizers">
+    <meta property="og:title" content="Echo Music Canvas Hub">
     <meta property="og:description" content="Discover, search, and submit custom vertical background visualizers and music video loops for the Echo Music App.">
     <meta property="og:image" content="https://canvas.echomusic.fun/App%20Logo/echo.png">
 
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://canvas.echomusic.fun/">
-    <meta property="twitter:title" content="Echo Music Canvas Hub - Custom Motion Visualizers">
+    <meta property="twitter:title" content="Echo Music Canvas Hub">
     <meta property="twitter:description" content="Discover, search, and submit custom vertical background visualizers and music video loops for the Echo Music App.">
     <meta property="twitter:image" content="https://canvas.echomusic.fun/App%20Logo/echo.png">
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Echo Music Canvas",
-      "url": "https://canvas.echomusic.fun/",
-      "description": "Discover and submit custom vertical background visualizers and music videos for the Echo Music App.",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://canvas.echomusic.fun/?search={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-
     <link rel="icon" type="image/png" href="App Logo/echo.png">
-    <link rel="stylesheet" href="styles.css?v=3">
+    <link rel="stylesheet" href="styles.css?v=4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 </head>
@@ -49,171 +34,56 @@
         <div class="top-bar-content">
             <a href="index.html" class="brand">
                 <img src="App Logo/echo.png" alt="Echo Music Logo" class="app-icon">
-                <span class="copyright">ECHO MUSIC</span>
+                <span class="brand-text">Echo Canvas</span>
             </a>
+            
+            <div class="nav-search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" class="nav-search-input" placeholder="Search by song, artist..." autocomplete="off">
+            </div>
+
             <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
             <div class="nav-links" id="nav-links">
-                <a href="developer.html" class="nav-support-btn"><i class="fas fa-code" style="margin-right: 0.3rem;"></i>Developer</a>
-                <a href="pending.html" class="nav-support-btn nav-pending-btn"><i class="fas fa-code-pull-request" style="margin-right: 0.3rem;"></i>Pending PRs</a>
-                <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="nav-support-btn"><i class="fas fa-hand-holding-heart" style="margin-right: 0.3rem;"></i>Support</a>
+                <a href="developer.html" class="nav-btn-text">API</a>
+                <a href="pending.html" class="nav-btn-text">Queue</a>
+                <a href="contribute.html" class="nav-btn-primary">Upload</a>
             </div>
         </div>
     </nav>
 
     <main class="container">
-        <header>
-            <h1 id="main-title">Echo Music Canvas</h1>
-            <p>The ultimate hub for custom motion artwork. Personalize your music experience with beautiful, looping
-                visuals in Echo Music.</p>
-            <div class="cta-container" style="margin-top: 2.5rem;">
-                <a href="contribute.html" class="btn btn-primary">
-                    <i class="fab fa-github"></i> Contribute through GitHub
-                </a>
-                <a href="#gallery-header" class="btn btn-secondary">
-                    <i class="fas fa-play-circle"></i> Browse Canvases
-                </a>
-            </div>
-        </header>
-
-        <section id="guide-section" class="instructions-section">
-            <h2 class="section-title">How to add a Canvas</h2>
-            <div class="instruction-grid">
-                <article class="step-card">
-                    <span class="step-number">01</span>
-                    <h3>Open the Portal</h3>
-                    <p>Head to the <a href="contribute.html"><strong>Contribute Portal</strong></a> and log in with your GitHub account. The portal handles forking, branching, and Pull Requests for you automatically.</p>
-                </article>
-
-                <article class="step-card">
-                    <span class="step-number">02</span>
-                    <h3>Pick Your Canvas</h3>
-                    <p><strong>Upload a new video</strong> (<code>.mp4</code> or <code>.m3u8</code>, max 5MB, 9:16 vertical) — or <strong>reuse an existing canvas</strong> from the gallery by searching for it. No duplicate uploads needed.</p>
-                </article>
-
-                <article class="step-card">
-                    <span class="step-number">03</span>
-                    <h3>Link Multiple Songs</h3>
-                    <p>Add <strong>one or many songs</strong> that should use this canvas. Perfect for album canvases — just add every track in one go, and they all share the same visual.</p>
-                </article>
-
-                <article class="step-card">
-                    <span class="step-number">04</span>
-                    <h3>Enable in App</h3>
-                    <p>Once merged, open Echo Music → <strong>Settings</strong> → <strong>Playback Settings</strong> → toggle <strong>Enable Canvas</strong>. Your visualizer goes live instantly.</p>
-                </article>
-            </div>
-        </section>
-
-        <section id="gallery-header" class="status-bar">
-            <h2>Canvas Directory</h2>
-            <span id="song-count">Loading database...</span>
-        </section>
-
         <div id="local-warning" class="local-warning-banner" style="display: none;"></div>
-        <section class="search-container">
-            <input type="text" id="search-input" placeholder="Search by song or artist..." autocomplete="off">
+
+        <section class="gallery-header">
+            <span id="song-count" class="badge">Loading...</span>
         </section>
 
-        <section id="canvas-grid" class="grid">
+        <section id="canvas-grid" class="pinterest-grid">
             <div class="loader" id="loading-spinner"></div>
         </section>
-
-        <section class="availability-section" style="margin-top: 6rem;">
-            <h2 class="section-title">Full Availability List</h2>
-            <div id="availability-list" class="list-container">
-            </div>
-        </section>
     </main>
-
-    <footer>
-        <div id="support-section" class="footer-content">
-            <div class="support-box">
-                <h3>Need Help or Have Canvas Issues?</h3>
-                <p>If you encounter any issues with canvases, please report them, or join our community groups to get support and stay updated.</p>
-                <div class="support-buttons">
-                    <a href="https://github.com/EchoMusicApp/Echo-Music-Canvas/issues" class="btn-support github" target="_blank" rel="noopener">
-                        <i class="fab fa-github"></i> Create GitHub Issue
-                    </a>
-                    <a href="https://discord.com/invite/EcfV3AxH5c" class="btn-support discord" target="_blank" rel="noopener">
-                        <i class="fab fa-discord"></i> Join Discord
-                    </a>
-                    <a href="https://t.me/EchoMusicApp" class="btn-support telegram" target="_blank" rel="noopener">
-                        <i class="fab fa-telegram"></i> Join Telegram
-                    </a>
-                </div>
-            </div>
-            
-            <div class="footer-credits">
-                <p style="font-size: 0.85rem; opacity: 0.7;">
-                    Echo Music Canvas is a fork of <a href="https://github.com/vivizzz007/vivimusicanvas" target="_blank" rel="noopener">vivimusicanvas</a> by <a href="https://github.com/vivizzz007" target="_blank" rel="noopener">vivizzz007</a>.
-                </p>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.6;">Licensed under <a href="LICENSE" target="_blank">GPL-3.0</a>.</p>
-            </div>
-        </div>
-    </footer>
 
     <script>
         let allItems = [];
 
         const fallbackItems = [
-            {
-                "song": "Dracula",
-                "artist": "Tame Impala",
-                "url": "https://canvas.echomusic.app/Song/1.mp4"
-            },
-            {
-                "song": "Flowers",
-                "artist": "Miley Cyrus",
-                "url": "https://canvas.echomusic.app/Song/2.mp4"
-            },
-            {
-                "song": "12 to 12",
-                "artist": "sombr",
-                "url": "https://canvas.echomusic.app/Song/12.m3u8"
-            },
-            {
-                "song": "her",
-                "artist": "JVKE",
-                "url": "https://canvas.echomusic.app/Song/4.mp4"
-            },
-            {
-                "song": "Olu",
-                "artist": "Sid Sriram, Sreehari K, & Shamzu Zayba",
-                "url": "https://canvas.echomusic.app/Song/5.mp4"
-            },
-            {
-                "song": "dont be afraid",
-                "artist": "Knxwledge",
-                "url": "https://canvas.echomusic.app/Song/6.mp4"
-            },
-            {
-                "song": "Good Goodbye",
-                "artist": "HWASA",
-                "url": "https://canvas.echomusic.app/Song/8.mp4"
-            },
-            {
-                "song": "Annihilate",
-                "artist": "Metro Boomin",
-                "url": "https://canvas.echomusic.app/Song/7.m3u8"
-            },
-            {
-                "song": "Dawn FM",
-                "artist": "The Weeknd",
-                "url": "https://canvas.echomusic.app/Song/9.m3u8"
-            },
-            {
-                "song": "Lost In Yesterday",
-                "artist": "Tame Impala",
-                "url": "https://canvas.echomusic.app/Song/10.m3u8"
-            }
+            { "song": "Dracula", "artist": "Tame Impala", "url": "https://canvas.echomusic.app/Song/1.mp4" },
+            { "song": "Flowers", "artist": "Miley Cyrus", "url": "https://canvas.echomusic.app/Song/2.mp4" },
+            { "song": "12 to 12", "artist": "sombr", "url": "https://canvas.echomusic.app/Song/12.m3u8" },
+            { "song": "her", "artist": "JVKE", "url": "https://canvas.echomusic.app/Song/4.mp4" },
+            { "song": "Olu", "artist": "Sid Sriram", "url": "https://canvas.echomusic.app/Song/5.mp4" },
+            { "song": "dont be afraid", "artist": "Knxwledge", "url": "https://canvas.echomusic.app/Song/6.mp4" },
+            { "song": "Good Goodbye", "artist": "HWASA", "url": "https://canvas.echomusic.app/Song/8.mp4" },
+            { "song": "Annihilate", "artist": "Metro Boomin", "url": "https://canvas.echomusic.app/Song/7.m3u8" },
+            { "song": "Dawn FM", "artist": "The Weeknd", "url": "https://canvas.echomusic.app/Song/9.m3u8" },
+            { "song": "Lost In Yesterday", "artist": "Tame Impala", "url": "https://canvas.echomusic.app/Song/10.m3u8" }
         ];
 
         function handleSearch(term) {
             if (term.trim() === '') {
-                renderGallery(allItems.slice(0, 3));
-                renderAvailability(allItems);
+                renderGallery(allItems);
                 const isLocal = window.location.protocol === 'file:';
                 document.getElementById('song-count').textContent = `${allItems.length} ${isLocal ? 'preview' : 'active'} canvases`;
             } else {
@@ -222,7 +92,6 @@
                     return combined.includes(term);
                 });
                 renderGallery(filtered);
-                renderAvailability(filtered);
                 document.getElementById('song-count').textContent = filtered.length === 1 ? '1 match found' : `${filtered.length} matches found`;
             }
         }
@@ -234,6 +103,9 @@
 
                 const data = await response.json();
                 allItems = data.items || [];
+                
+                // Reverse so newest are at the top
+                allItems.reverse();
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const query = urlParams.get('search');
@@ -244,27 +116,19 @@
                     handleSearch('');
                 }
             } catch (error) {
-                console.warn("CORS/Fetch restriction detected. Falling back to local preview database.", error);
-                
+                console.warn("CORS/Fetch restriction detected. Falling back to local preview.", error);
                 allItems = fallbackItems;
                 
                 if (window.location.protocol === 'file:') {
                     const warningBanner = document.getElementById('local-warning');
                     warningBanner.innerHTML = `
                         <i class="fas fa-exclamation-triangle"></i>
-                        <span>Local browser policy blocks <code>canvas.json</code> relative fetches. Showing <strong>${allItems.length} local preview canvases</strong>. Start a server with <code>npx serve</code> or view the deployed version to load the full list.</span>
+                        <span>Local preview mode. Showing <strong>${allItems.length} canvases</strong>.</span>
                     `;
                     warningBanner.style.display = 'flex';
                 }
 
-                const urlParams = new URLSearchParams(window.location.search);
-                const query = urlParams.get('search');
-                if (query) {
-                    document.getElementById('search-input').value = query;
-                    handleSearch(query.toLowerCase());
-                } else {
-                    handleSearch('');
-                }
+                handleSearch('');
             }
         }
 
@@ -275,7 +139,7 @@
             if (items.length === 0) {
                 grid.innerHTML = `
                     <p class="empty-state">
-                        No matching songs found in the gallery.
+                        We couldn't find any canvases matching your search.
                     </p>
                 `;
                 return;
@@ -283,7 +147,7 @@
 
             items.forEach((item, index) => {
                 const card = document.createElement('article');
-                card.className = 'canvas-card';
+                card.className = 'pin-card';
                 
                 let resolvedUrl = item.url;
                 try {
@@ -299,12 +163,15 @@
                 const videoId = "vid_" + Math.random().toString(36).substr(2, 9) + "_" + index;
 
                 card.innerHTML = `
-                    <div class="video-preview">
+                    <div class="pin-media">
                         <video id="${videoId}" loop muted playsinline onplay="this.volume=0"></video>
+                        <div class="pin-overlay">
+                            <button class="pin-action-btn"><i class="fas fa-play"></i> Play</button>
+                        </div>
                     </div>
-                    <div class="card-info">
-                        <h2>${item.song}</h2>
-                        <h3>${item.artist}</h3>
+                    <div class="pin-info">
+                        <h2 class="pin-title">${item.song}</h2>
+                        <h3 class="pin-artist">${item.artist}</h3>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -324,10 +191,12 @@
                     video.load();
                 }
 
-                card.addEventListener('mouseenter', () => {
+                const mediaContainer = card.querySelector('.pin-media');
+                
+                mediaContainer.addEventListener('mouseenter', () => {
                     video.play().catch(err => console.log('Autoplay blocked:', err));
                 });
-                card.addEventListener('mouseleave', () => {
+                mediaContainer.addEventListener('mouseleave', () => {
                     video.pause();
                 });
 
@@ -338,31 +207,6 @@
                         video.pause();
                     }
                 });
-            });
-        }
-
-        function renderAvailability(items) {
-            const list = document.getElementById('availability-list');
-            list.innerHTML = '';
-
-            if (items.length === 0) {
-                list.innerHTML = `<p class="empty-state" style="padding: 2rem;">No songs found matching that search.</p>`;
-                return;
-            }
-
-            items.forEach((item) => {
-                const itemEl = document.createElement('div');
-                itemEl.className = 'list-item';
-                itemEl.innerHTML = `
-                    <div class="item-info">
-                        <strong>${item.song}</strong>
-                        <span>${item.artist}</span>
-                    </div>
-                    <div class="status-badge">
-                        <i class="fas fa-check-circle"></i> Added
-                    </div>
-                `;
-                list.appendChild(itemEl);
             });
         }
 
@@ -392,5 +236,4 @@
         })();
     </script>
 </body>
-
 </html>
