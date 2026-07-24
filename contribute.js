@@ -509,9 +509,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const thumbnail = item.thumbnail || '';
                         
                         return `
-                            <button type="button" class="existing-result-item" data-song="${escapeAttr(songName)}" data-artist="${escapeAttr(artistName)}">
-                                ${thumbnail ? `<img src="${escapeAttr(thumbnail)}" alt="cover" style="width: 40px; height: 40px; border-radius: 4px; margin-right: 1rem; object-fit: cover;">` : ''}
-                                <span class="existing-result-label" style="text-align: left;">
+                            <button type="button" class="existing-result-item" style="justify-content: flex-start; gap: 16px;" data-song="${escapeAttr(songName)}" data-artist="${escapeAttr(artistName)}">
+                                ${thumbnail ? `<img src="${escapeAttr(thumbnail)}" alt="cover" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; flex-shrink: 0;">` : ''}
+                                <span class="existing-result-label" style="text-align: left; align-items: flex-start;">
                                     <span class="existing-result-song">${escapeHtml(songName)}</span>
                                     <span class="existing-result-artist">${escapeHtml(artistName)}</span>
                                 </span>
