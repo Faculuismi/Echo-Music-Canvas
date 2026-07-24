@@ -30,7 +30,10 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add canvas.json submissions/
+          git add canvas.json
+          if [ -d "submissions" ]; then
+            git add submissions/
+          fi
           
           if git diff --staged --quiet; then
             echo "No changes to commit."
