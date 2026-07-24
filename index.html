@@ -162,9 +162,10 @@
                 const isM3u8 = resolvedUrl && resolvedUrl.toLowerCase().endsWith('.m3u8');
                 const videoId = "vid_" + Math.random().toString(36).substr(2, 9) + "_" + index;
 
+                // Add data-src instead of setting src directly for lazy loading
                 card.innerHTML = `
                     <div class="pin-media">
-                        <video id="${videoId}" loop muted playsinline onplay="this.volume=0"></video>
+                        <video id="${videoId}" loop muted playsinline onplay="this.volume=0" data-src="${resolvedUrl}" data-ism3u8="${isM3u8}"></video>
                         <div class="pin-overlay">
                             <button class="pin-action-btn"><i class="fas fa-play"></i> Play</button>
                         </div>
@@ -177,38 +178,58 @@
                 grid.appendChild(card);
 
                 const video = document.getElementById(videoId);
-
-                if (isM3u8) {
-                    if (Hls.isSupported()) {
-                        const hls = new Hls();
-                        hls.loadSource(resolvedUrl);
-                        hls.attachMedia(video);
-                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                        video.src = resolvedUrl;
-                    }
-                } else {
-                    video.src = resolvedUrl;
-                    video.load();
-                }
-
                 const mediaContainer = card.querySelector('.pin-media');
                 
+                // Set up hover/click interactions immediately
                 mediaContainer.addEventListener('mouseenter', () => {
-                    video.play().catch(err => console.log('Autoplay blocked:', err));
+                    video.play().catch(() => {});
                 });
                 mediaContainer.addEventListener('mouseleave', () => {
                     video.pause();
                 });
-
                 card.addEventListener('click', () => {
                     if (video.paused) {
-                        video.play().catch(err => console.log('Playback blocked:', err));
+                        video.play().catch(() => {});
                     } else {
                         video.pause();
                     }
                 });
+                
+                // Observe the card for lazy loading
+                observer.observe(card);
             });
         }
+
+        // IntersectionObserver for Lazy Loading Videos
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const card = entry.target;
+                    const video = card.querySelector('video');
+                    if (video && video.dataset.src) {
+                        const src = video.dataset.src;
+                        const isM3u8 = video.dataset.ism3u8 === 'true';
+                        
+                        if (isM3u8) {
+                            if (Hls.isSupported()) {
+                                const hls = new Hls();
+                                hls.loadSource(src);
+                                hls.attachMedia(video);
+                            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                                video.src = src;
+                            }
+                        } else {
+                            video.src = src;
+                            video.load();
+                        }
+                        
+                        // Remove data-src so we don't load it again
+                        video.removeAttribute('data-src');
+                    }
+                    observer.unobserve(card);
+                }
+            });
+        }, { rootMargin: '100px 0px' });
 
         document.getElementById('search-input').addEventListener('input', (e) => {
             handleSearch(e.target.value.toLowerCase());
@@ -235,5 +256,9 @@
             });
         })();
     </script>
+    
+    <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="floating-donation" title="Support Echo Music">
+        <i class="fas fa-hand-holding-heart"></i>
+    </a>
 </body>
 </html>

@@ -391,3 +391,41 @@ body {
         gap: 12px;
     }
 }
+
+/* =========================================
+   FLOATING DONATION BUTTON
+   ========================================= */
+.floating-donation {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #059669;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4);
+    text-decoration: none;
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.floating-donation:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(5, 150, 105, 0.5);
+    background: #047857;
+}
+
+@media (max-width: 768px) {
+    .floating-donation {
+        bottom: 16px;
+        right: 16px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+}

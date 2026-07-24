@@ -26,15 +26,20 @@
         <div class="top-bar-content">
             <a href="index.html" class="brand">
                 <img src="App Logo/echo.png" alt="Echo Music Logo" class="app-icon">
-                <span class="copyright">ECHO MUSIC</span>
+                <span class="brand-text">Echo Canvas</span>
             </a>
+            
+            <div class="nav-search-container">
+                <!-- Spacer -->
+            </div>
+
             <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
             <div class="nav-links" id="nav-links">
-                <a href="developer.html" class="nav-support-btn"><i class="fas fa-code" style="margin-right: 0.3rem;"></i>Developer</a>
-                <a href="pending.html" class="nav-support-btn nav-active-btn"><i class="fas fa-code-pull-request" style="margin-right: 0.3rem;"></i>Pending PRs</a>
-                <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="nav-support-btn"><i class="fas fa-hand-holding-heart" style="margin-right: 0.3rem;"></i>Support</a>
+                <a href="developer.html" class="nav-btn-text">API</a>
+                <a href="pending.html" class="nav-btn-text" style="color: var(--accent);">Queue</a>
+                <a href="contribute.html" class="nav-btn-primary">Upload</a>
             </div>
         </div>
     </nav>
@@ -283,26 +288,16 @@
                 </div>
             `;
 
-            // Set up video playback
+            // Set up video playback via Lazy Loading
             if (videoUrl) {
                 const videoEl = card.querySelector(`#${videoId}`);
                 const wrapper = card.querySelector('.pending-video-wrapper');
                 const overlay = card.querySelector('.pending-video-overlay');
-
+                
+                // Add data attributes for the observer to pick up
                 const isM3u8 = videoUrl.toLowerCase().endsWith('.m3u8');
-
-                if (isM3u8) {
-                    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-                        const hls = new Hls();
-                        hls.loadSource(videoUrl);
-                        hls.attachMedia(videoEl);
-                    } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
-                        videoEl.src = videoUrl;
-                    }
-                } else {
-                    videoEl.src = videoUrl;
-                    videoEl.load();
-                }
+                videoEl.dataset.src = videoUrl;
+                videoEl.dataset.ism3u8 = isM3u8;
 
                 wrapper.addEventListener('mouseenter', () => {
                     overlay.style.opacity = '0';
@@ -321,10 +316,45 @@
                         videoEl.pause();
                     }
                 });
+                
+                // Observe for lazy loading
+                if (window.pendingObserver) {
+                    window.pendingObserver.observe(card);
+                }
             }
 
             return card;
         }
+
+        // Initialize IntersectionObserver for lazy loading pending videos
+        window.pendingObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const card = entry.target;
+                    const videoEl = card.querySelector('video');
+                    if (videoEl && videoEl.dataset.src) {
+                        const src = videoEl.dataset.src;
+                        const isM3u8 = videoEl.dataset.ism3u8 === 'true';
+
+                        if (isM3u8) {
+                            if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+                                const hls = new Hls();
+                                hls.loadSource(src);
+                                hls.attachMedia(videoEl);
+                            } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+                                videoEl.src = src;
+                            }
+                        } else {
+                            videoEl.src = src;
+                            videoEl.load();
+                        }
+                        
+                        videoEl.removeAttribute('data-src');
+                    }
+                    observer.unobserve(card);
+                }
+            });
+        }, { rootMargin: '100px 0px' });
 
         function getTimeAgo(date) {
             const seconds = Math.floor((new Date() - date) / 1000);
@@ -375,6 +405,9 @@
             });
         })();
     </script>
+    
+    <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="floating-donation" title="Support Echo Music">
+        <i class="fas fa-hand-holding-heart"></i>
+    </a>
 </body>
-
 </html>
