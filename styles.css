@@ -1245,4 +1245,37 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+/* =========================================
+   GENERAL BUTTONS
+   ========================================= */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 32px;
+    border-radius: var(--border-radius-pill);
+    font-weight: 700;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.btn-primary:hover:not(:disabled) {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 0, 35, 0.25);
+}
+.btn-primary:disabled {
+    background: var(--btn-gray-hover);
+    color: var(--text-dim);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+
 

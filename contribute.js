@@ -425,13 +425,13 @@ document.addEventListener('DOMContentLoaded', () => {
         row.dataset.id  = id;
         row.innerHTML = `
             <div class="song-entry-content" style="flex: 1; display: flex; flex-direction: column;">
-                <div class="song-entry-search" style="margin-bottom: 0.75rem;">
+                <div class="song-entry-search" style="margin-bottom: 0.75rem; position: relative;">
                     <div class="existing-search-box">
                         <i class="fas fa-search existing-search-icon"></i>
                         <input type="text" class="song-api-search" placeholder="Search YT Music for song..." autocomplete="off">
                         <i class="fas fa-circle-notch fa-spin search-loader" style="display: none; position: absolute; right: 1rem; color: var(--text-dim);"></i>
                     </div>
-                    <div class="api-search-results existing-results-list" style="display: none; max-height: 250px; overflow-y: auto; margin-top: 0.5rem; position: absolute; z-index: 10; width: calc(100% - 3.5rem); box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></div>
+                    <div class="api-search-results existing-results-list" style="display: none; max-height: 250px; overflow-y: auto; margin-top: 0.5rem; position: absolute; top: 100%; left: 0; z-index: 10; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.15);"></div>
                 </div>
                 <div class="song-entry-fields">
                     <input type="text"
@@ -439,13 +439,13 @@ document.addEventListener('DOMContentLoaded', () => {
                            placeholder="Song title (e.g. Lost in Yesterday)"
                            autocomplete="off"
                            maxlength="120"
-                           value="${escapeAttr(songVal)}">
+                           value="${escapeAttr(songVal)}" readonly>
                     <input type="text"
                            class="song-entry-artist"
                            placeholder="Artist name (e.g. Tame Impala)"
                            autocomplete="off"
                            maxlength="120"
-                           value="${escapeAttr(artistVal)}">
+                           value="${escapeAttr(artistVal)}" readonly>
                 </div>
             </div>
             <button type="button" class="btn-remove-song-entry" title="Remove this entry">
