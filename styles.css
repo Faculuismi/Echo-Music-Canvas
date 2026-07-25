@@ -767,7 +767,7 @@ body {
    UPLOAD / CONTRIBUTE PAGE STYLES
    ========================================= */
 .auth-clean-section {
-    background: var(--btn-gray);
+    background: transparent;
     padding: 4rem 2rem;
     border-radius: var(--border-radius-card);
     margin-top: 4rem;
@@ -1366,4 +1366,33 @@ body {
 ::view-transition-new(root) {
     animation-duration: 0.4s;
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================================
+   MINIMAL HOMESCREEN
+   ========================================= */
+.minimal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding-top: 60px; /* offset for top bar */
+    text-align: center;
+}
+.minimal-center-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+}
+.total-canvas-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -1px;
+}
+.community-text {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-dim);
 }

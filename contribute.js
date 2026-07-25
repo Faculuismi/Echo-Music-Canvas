@@ -133,27 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function checkLoginLimitStatus() {
-        try {
-            let statusUrl = '/api/auth/status';
-            if (window.location.protocol === 'file:') {
-                statusUrl = 'https://canvas.echomusic.fun/api/auth/status';
-            }
-            const res  = await fetch(statusUrl);
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            loginLimitBanner.style.display = 'block';
-            const percent = Math.min((data.count / data.limit) * 100, 100);
-            limitBarProgress.style.width = `${percent}%`;
-            if (data.limitReached) {
-                loginBtn.disabled = true;
-                limitStatusText.innerHTML = `<span class="limit-warning">Daily limit reached (${data.count}/${data.limit}).</span> Logins are paused until tomorrow to prevent automated spam and protect repository quotas.`;
-            } else {
-                loginBtn.disabled = false;
-                limitStatusText.innerHTML = `<center><strong>${data.count} / ${data.limit} daily logins used.</strong></center> <br> To ensure fair usage, prevent abuse, and maintain service availability within budget, login requests are limited to <strong>500 per day</strong>. If the daily limit is reached, further logins may be temporarily unavailable until the quota resets.`;
-            }
-        } catch (e) {
-            loginLimitBanner.style.display = 'none';
-        }
+        // Feature removed at user request to keep UI minimal
     }
 
     async function loadCanvasItems() {

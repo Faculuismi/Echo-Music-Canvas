@@ -37,11 +37,6 @@
                 <span class="brand-text">Echo Canvas</span>
             </a>
             
-            <div class="nav-search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="search-input" class="nav-search-input" placeholder="Search by song, artist..." autocomplete="off">
-            </div>
-
             <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
@@ -53,300 +48,36 @@
         </div>
     </nav>
 
-    <main class="container">
-        <div id="local-warning" class="local-warning-banner" style="display: none;"></div>
-
-        <section class="gallery-header">
-            <span id="song-count" class="badge">Loading...</span>
+    <main class="minimal-container">
+        <section class="minimal-center-content">
+            <h1 class="total-canvas-text">Total number of Canvas - <span id="total-count">...</span></h1>
+            <p class="community-text">From the community for the community</p>
         </section>
-
-        <section id="canvas-grid" class="pinterest-grid">
-            <div class="loader" id="loading-spinner"></div>
-        </section>
-        <!-- Sentinel for infinite scrolling -->
-        <div id="scroll-sentinel" style="height: 1px;"></div>
     </main>
 
     <script>
-        let allItems = [];
-        let filteredItems = [];
-        let currentPage = 0;
-        const itemsPerPage = 20;
-
-        const fallbackItems = [
-            { "song": "Dracula", "artist": "Tame Impala", "url": "https://canvas.echomusic.app/Song/1.mp4" },
-            { "song": "Flowers", "artist": "Miley Cyrus", "url": "https://canvas.echomusic.app/Song/2.mp4" },
-            { "song": "12 to 12", "artist": "sombr", "url": "https://canvas.echomusic.app/Song/12.m3u8" },
-            { "song": "her", "artist": "JVKE", "url": "https://canvas.echomusic.app/Song/4.mp4" },
-            { "song": "Olu", "artist": "Sid Sriram", "url": "https://canvas.echomusic.app/Song/5.mp4" },
-            { "song": "dont be afraid", "artist": "Knxwledge", "url": "https://canvas.echomusic.app/Song/6.mp4" },
-            { "song": "Good Goodbye", "artist": "HWASA", "url": "https://canvas.echomusic.app/Song/8.mp4" },
-            { "song": "Annihilate", "artist": "Metro Boomin", "url": "https://canvas.echomusic.app/Song/7.m3u8" },
-            { "song": "Dawn FM", "artist": "The Weeknd", "url": "https://canvas.echomusic.app/Song/9.m3u8" },
-            { "song": "Lost In Yesterday", "artist": "Tame Impala", "url": "https://canvas.echomusic.app/Song/10.m3u8" }
-        ];
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        function handleSearch(term) {
-            const updateDOM = () => {
-                if (term.trim() === '') {
-                    filteredItems = allItems;
-                    const isLocal = window.location.protocol === 'file:';
-                    document.getElementById('song-count').textContent = `${allItems.length} ${isLocal ? 'preview' : 'active'} canvases`;
-                } else {
-                    filteredItems = allItems.filter(item => {
-                        const combined = `${item.song} ${item.artist}`.toLowerCase();
-                        return combined.includes(term);
-                    });
-                    document.getElementById('song-count').textContent = filteredItems.length === 1 ? '1 match found' : `${filteredItems.length} matches found`;
-                }
-                currentPage = 0;
-                renderGallery(filteredItems.slice(0, itemsPerPage), false);
-            };
-
-            if (document.startViewTransition) {
-                document.startViewTransition(updateDOM);
-            } else {
-                updateDOM();
-            }
-        }
-
-        function loadNextPage() {
-            const startIndex = currentPage * itemsPerPage;
-            const nextItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
-            if (nextItems.length > 0) {
-                renderGallery(nextItems, true);
-            }
-        }
-
-        function renderSkeletons(count = 10, append = false) {
-            const grid = document.getElementById('canvas-grid');
-            if (!append) grid.innerHTML = '';
-            for (let i = 0; i < count; i++) {
-                const card = document.createElement('article');
-                card.className = 'pin-card skeleton-card';
-                card.innerHTML = `
-                    <div class="pin-media skeleton-media"></div>
-                    <div class="pin-info">
-                        <div class="skeleton-text skeleton-title"></div>
-                        <div class="skeleton-text skeleton-artist"></div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            }
-        }
-
-        async function loadCanvases() {
-            renderSkeletons(itemsPerPage);
+        async function loadCanvasCount() {
             try {
-                const response = await fetch(`./canvas.json?v=${Date.now()}`);
-                if (!response.ok) throw new Error('Failed to load metadata');
+                let response;
+                try {
+                    response = await fetch(`./canvas.json?v=${Date.now()}`);
+                } catch (e) {
+                    // If local fetch fails (e.g., CORS on file:// protocol), try fetching from the live site
+                    response = await fetch(`https://canvas.echomusic.fun/canvas.json?v=${Date.now()}`);
+                }
+                
+                if (!response || !response.ok) throw new Error('Failed to load metadata');
 
                 const data = await response.json();
-                allItems = data.items || [];
-                
-                // Reverse so newest are at the top
-                allItems.reverse();
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const query = urlParams.get('search');
-                if (query) {
-                    document.getElementById('search-input').value = query;
-                    handleSearch(query.toLowerCase());
-                } else {
-                    handleSearch('');
-                }
+                const items = data.items || [];
+                document.getElementById('total-count').textContent = items.length.toLocaleString();
             } catch (error) {
-                console.warn("CORS/Fetch restriction detected. Falling back to local preview.", error);
-                allItems = fallbackItems;
-                
-                if (window.location.protocol === 'file:') {
-                    const warningBanner = document.getElementById('local-warning');
-                    warningBanner.innerHTML = `
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Local preview mode. Showing <strong>${allItems.length} canvases</strong>.</span>
-                    `;
-                    warningBanner.style.display = 'flex';
-                }
-
-                handleSearch('');
+                console.warn("Failed to load canvas count:", error);
+                document.getElementById('total-count').textContent = 'Many'; 
             }
         }
 
-        function renderGallery(items, append = false) {
-            const grid = document.getElementById('canvas-grid');
-            if (!append) grid.innerHTML = '';
-
-            if (items.length === 0 && !append) {
-                grid.innerHTML = `
-                    <p class="empty-state">
-                        We couldn't find any canvases matching your search.
-                    </p>
-                `;
-                return;
-            }
-
-            items.forEach((item, index) => {
-                const card = document.createElement('article');
-                card.className = 'pin-card';
-                
-                let resolvedUrl = item.url;
-                try {
-                    const parsedUrl = new URL(item.url);
-                    const match = parsedUrl.pathname.match(/\/(Song|Album)\/(.+)$/i);
-                    if (match) {
-                        resolvedUrl = `./${match[1]}/${match[2]}`;
-                    }
-                } catch (e) {
-                }
-
-                const isM3u8 = resolvedUrl && resolvedUrl.toLowerCase().endsWith('.m3u8');
-                const videoId = "vid_" + Math.random().toString(36).substr(2, 9) + "_" + index;
-
-                // Add data-src instead of setting src directly for lazy loading. Added preload="none" and poster
-                card.innerHTML = `
-                    <div class="pin-media">
-                        <video id="${videoId}" poster="App Logo/echo.png" preload="none" loop muted playsinline onplay="this.volume=0" data-src="${resolvedUrl}" data-ism3u8="${isM3u8}"></video>
-                        <div class="pin-overlay">
-                            <button class="pin-action-btn"><i class="fas fa-play"></i> Play</button>
-                            <button class="pin-audio-btn"><i class="fas fa-volume-mute"></i></button>
-                        </div>
-                    </div>
-                    <div class="pin-info">
-                        <h2 class="pin-title">${item.song}</h2>
-                        <h3 class="pin-artist">${item.artist}</h3>
-                    </div>
-                `;
-                grid.appendChild(card);
-
-                const video = document.getElementById(videoId);
-                const mediaContainer = card.querySelector('.pin-media');
-                const audioBtn = card.querySelector('.pin-audio-btn');
-                
-                // Set up hover/click interactions immediately
-                mediaContainer.addEventListener('mouseenter', () => {
-                    video.play().catch(() => {});
-                });
-                mediaContainer.addEventListener('mouseleave', () => {
-                    video.pause();
-                });
-                card.addEventListener('click', (e) => {
-                    // Prevent card click from triggering if audio button is clicked
-                    if (e.target.closest('.pin-audio-btn')) return;
-                    
-                    if (video.paused) {
-                        video.play().catch(() => {});
-                    } else {
-                        video.pause();
-                    }
-                });
-
-                audioBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (video.muted) {
-                        video.muted = false;
-                        video.volume = 1;
-                        audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-                    } else {
-                        video.muted = true;
-                        video.volume = 0;
-                        audioBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-                    }
-                });
-
-                const handleError = () => {
-                    mediaContainer.innerHTML = `
-                        <div class="canvas-error-state">
-                            <i class="fas fa-link-slash"></i>
-                            <span>Unavailable</span>
-                        </div>
-                    `;
-                };
-                
-                // Improved Error UI instead of hiding
-                video.addEventListener('error', handleError);
-                card.dataset.videoId = videoId; // Store reference for HLS
-                
-                // Observe the card for lazy loading
-                observer.observe(card);
-            });
-            
-            currentPage++;
-        }
-
-        // IntersectionObserver for Lazy Loading Videos
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const card = entry.target;
-                    const video = card.querySelector('video');
-                    if (video && video.dataset.src) {
-                        const src = video.dataset.src;
-                        const isM3u8 = video.dataset.ism3u8 === 'true';
-                        
-                        if (isM3u8) {
-                            if (Hls.isSupported()) {
-                                const hls = new Hls();
-                                hls.loadSource(src);
-                                hls.attachMedia(video);
-                                hls.on(Hls.Events.ERROR, function (event, data) {
-                                    if (data.fatal) {
-                                        const mediaContainer = card.querySelector('.pin-media');
-                                        if(mediaContainer) {
-                                            mediaContainer.innerHTML = `
-                                                <div class="canvas-error-state">
-                                                    <i class="fas fa-link-slash"></i>
-                                                    <span>Unavailable</span>
-                                                </div>
-                                            `;
-                                        }
-                                    }
-                                });
-                            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                                video.src = src;
-                            }
-                        } else {
-                            video.src = src;
-                            video.load();
-                        }
-                        
-                        // Remove data-src so we don't load it again
-                        video.removeAttribute('data-src');
-                    }
-                    observer.unobserve(card);
-                }
-            });
-        }, { rootMargin: '100px 0px' });
-
-        // IntersectionObserver for Infinite Scrolling
-        const sentinelObserver = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                loadNextPage();
-            }
-        }, { rootMargin: '200px 0px' });
-
-        const debouncedSearch = debounce((e) => {
-            handleSearch(e.target.value.toLowerCase());
-        }, 300);
-
-        document.getElementById('search-input').addEventListener('input', debouncedSearch);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCanvases();
-            const sentinel = document.getElementById('scroll-sentinel');
-            if (sentinel) sentinelObserver.observe(sentinel);
-        });
+        document.addEventListener('DOMContentLoaded', loadCanvasCount);
     </script>
     <script>
         (function() {
