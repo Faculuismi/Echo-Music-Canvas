@@ -63,10 +63,15 @@
         <section id="canvas-grid" class="pinterest-grid">
             <div class="loader" id="loading-spinner"></div>
         </section>
+        <!-- Sentinel for infinite scrolling -->
+        <div id="scroll-sentinel" style="height: 1px;"></div>
     </main>
 
     <script>
         let allItems = [];
+        let filteredItems = [];
+        let currentPage = 0;
+        const itemsPerPage = 20;
 
         const fallbackItems = [
             { "song": "Dracula", "artist": "Tame Impala", "url": "https://canvas.echomusic.app/Song/1.mp4" },
@@ -81,22 +86,69 @@
             { "song": "Lost In Yesterday", "artist": "Tame Impala", "url": "https://canvas.echomusic.app/Song/10.m3u8" }
         ];
 
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
         function handleSearch(term) {
-            if (term.trim() === '') {
-                renderGallery(allItems);
-                const isLocal = window.location.protocol === 'file:';
-                document.getElementById('song-count').textContent = `${allItems.length} ${isLocal ? 'preview' : 'active'} canvases`;
+            const updateDOM = () => {
+                if (term.trim() === '') {
+                    filteredItems = allItems;
+                    const isLocal = window.location.protocol === 'file:';
+                    document.getElementById('song-count').textContent = `${allItems.length} ${isLocal ? 'preview' : 'active'} canvases`;
+                } else {
+                    filteredItems = allItems.filter(item => {
+                        const combined = `${item.song} ${item.artist}`.toLowerCase();
+                        return combined.includes(term);
+                    });
+                    document.getElementById('song-count').textContent = filteredItems.length === 1 ? '1 match found' : `${filteredItems.length} matches found`;
+                }
+                currentPage = 0;
+                renderGallery(filteredItems.slice(0, itemsPerPage), false);
+            };
+
+            if (document.startViewTransition) {
+                document.startViewTransition(updateDOM);
             } else {
-                const filtered = allItems.filter(item => {
-                    const combined = `${item.song} ${item.artist}`.toLowerCase();
-                    return combined.includes(term);
-                });
-                renderGallery(filtered);
-                document.getElementById('song-count').textContent = filtered.length === 1 ? '1 match found' : `${filtered.length} matches found`;
+                updateDOM();
+            }
+        }
+
+        function loadNextPage() {
+            const startIndex = currentPage * itemsPerPage;
+            const nextItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
+            if (nextItems.length > 0) {
+                renderGallery(nextItems, true);
+            }
+        }
+
+        function renderSkeletons(count = 10, append = false) {
+            const grid = document.getElementById('canvas-grid');
+            if (!append) grid.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const card = document.createElement('article');
+                card.className = 'pin-card skeleton-card';
+                card.innerHTML = `
+                    <div class="pin-media skeleton-media"></div>
+                    <div class="pin-info">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-artist"></div>
+                    </div>
+                `;
+                grid.appendChild(card);
             }
         }
 
         async function loadCanvases() {
+            renderSkeletons(itemsPerPage);
             try {
                 const response = await fetch(`./canvas.json?v=${Date.now()}`);
                 if (!response.ok) throw new Error('Failed to load metadata');
@@ -132,11 +184,11 @@
             }
         }
 
-        function renderGallery(items) {
+        function renderGallery(items, append = false) {
             const grid = document.getElementById('canvas-grid');
-            grid.innerHTML = '';
+            if (!append) grid.innerHTML = '';
 
-            if (items.length === 0) {
+            if (items.length === 0 && !append) {
                 grid.innerHTML = `
                     <p class="empty-state">
                         We couldn't find any canvases matching your search.
@@ -162,12 +214,13 @@
                 const isM3u8 = resolvedUrl && resolvedUrl.toLowerCase().endsWith('.m3u8');
                 const videoId = "vid_" + Math.random().toString(36).substr(2, 9) + "_" + index;
 
-                // Add data-src instead of setting src directly for lazy loading
+                // Add data-src instead of setting src directly for lazy loading. Added preload="none" and poster
                 card.innerHTML = `
                     <div class="pin-media">
-                        <video id="${videoId}" loop muted playsinline onplay="this.volume=0" data-src="${resolvedUrl}" data-ism3u8="${isM3u8}"></video>
+                        <video id="${videoId}" poster="App Logo/echo.png" preload="none" loop muted playsinline onplay="this.volume=0" data-src="${resolvedUrl}" data-ism3u8="${isM3u8}"></video>
                         <div class="pin-overlay">
                             <button class="pin-action-btn"><i class="fas fa-play"></i> Play</button>
+                            <button class="pin-audio-btn"><i class="fas fa-volume-mute"></i></button>
                         </div>
                     </div>
                     <div class="pin-info">
@@ -179,6 +232,7 @@
 
                 const video = document.getElementById(videoId);
                 const mediaContainer = card.querySelector('.pin-media');
+                const audioBtn = card.querySelector('.pin-audio-btn');
                 
                 // Set up hover/click interactions immediately
                 mediaContainer.addEventListener('mouseenter', () => {
@@ -187,17 +241,48 @@
                 mediaContainer.addEventListener('mouseleave', () => {
                     video.pause();
                 });
-                card.addEventListener('click', () => {
+                card.addEventListener('click', (e) => {
+                    // Prevent card click from triggering if audio button is clicked
+                    if (e.target.closest('.pin-audio-btn')) return;
+                    
                     if (video.paused) {
                         video.play().catch(() => {});
                     } else {
                         video.pause();
                     }
                 });
+
+                audioBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (video.muted) {
+                        video.muted = false;
+                        video.volume = 1;
+                        audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    } else {
+                        video.muted = true;
+                        video.volume = 0;
+                        audioBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                    }
+                });
+
+                const handleError = () => {
+                    mediaContainer.innerHTML = `
+                        <div class="canvas-error-state">
+                            <i class="fas fa-link-slash"></i>
+                            <span>Unavailable</span>
+                        </div>
+                    `;
+                };
+                
+                // Improved Error UI instead of hiding
+                video.addEventListener('error', handleError);
+                card.dataset.videoId = videoId; // Store reference for HLS
                 
                 // Observe the card for lazy loading
                 observer.observe(card);
             });
+            
+            currentPage++;
         }
 
         // IntersectionObserver for Lazy Loading Videos
@@ -215,6 +300,19 @@
                                 const hls = new Hls();
                                 hls.loadSource(src);
                                 hls.attachMedia(video);
+                                hls.on(Hls.Events.ERROR, function (event, data) {
+                                    if (data.fatal) {
+                                        const mediaContainer = card.querySelector('.pin-media');
+                                        if(mediaContainer) {
+                                            mediaContainer.innerHTML = \`
+                                                <div class="canvas-error-state">
+                                                    <i class="fas fa-link-slash"></i>
+                                                    <span>Unavailable</span>
+                                                </div>
+                                            \`;
+                                        }
+                                    }
+                                });
                             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                                 video.src = src;
                             }
@@ -231,11 +329,24 @@
             });
         }, { rootMargin: '100px 0px' });
 
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            handleSearch(e.target.value.toLowerCase());
-        });
+        // IntersectionObserver for Infinite Scrolling
+        const sentinelObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                loadNextPage();
+            }
+        }, { rootMargin: '200px 0px' });
 
-        document.addEventListener('DOMContentLoaded', loadCanvases);
+        const debouncedSearch = debounce((e) => {
+            handleSearch(e.target.value.toLowerCase());
+        }, 300);
+
+        document.getElementById('search-input').addEventListener('input', debouncedSearch);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCanvases();
+            const sentinel = document.getElementById('scroll-sentinel');
+            if (sentinel) sentinelObserver.observe(sentinel);
+        });
     </script>
     <script>
         (function() {
@@ -260,5 +371,15 @@
     <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="floating-donation" title="Support Echo Music">
         <i class="fas fa-heart"></i> Support
     </a>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .catch(error => {
+                        console.warn('Service worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

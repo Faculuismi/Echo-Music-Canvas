@@ -1280,5 +1280,90 @@ body {
     box-shadow: none;
 }
 
+/* =========================================
+   SKELETON LOADING
+   ========================================= */
+.skeleton-card {
+    cursor: default;
+}
+.skeleton-media {
+    background: linear-gradient(90deg, var(--btn-gray) 25%, #f8f8f8 50%, var(--btn-gray) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+.skeleton-text {
+    background: linear-gradient(90deg, var(--btn-gray) 25%, #f8f8f8 50%, var(--btn-gray) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+.skeleton-title {
+    height: 16px;
+    width: 80%;
+}
+.skeleton-artist {
+    height: 12px;
+    width: 50%;
+}
 
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
 
+/* =========================================
+   AUDIO TOGGLE BUTTON
+   ========================================= */
+.pin-audio-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: var(--transition);
+    pointer-events: auto;
+    font-size: 0.9rem;
+}
+.pin-audio-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+/* =========================================
+   ERROR STATE (UNAVAILABLE CANVAS)
+   ========================================= */
+.canvas-error-state {
+    width: 100%;
+    height: 100%;
+    background: var(--btn-gray);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-dim);
+    gap: 8px;
+    font-weight: 500;
+}
+.canvas-error-state i {
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+
+/* =========================================
+   VIEW TRANSITIONS
+   ========================================= */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.4s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
