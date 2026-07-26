@@ -100,8 +100,18 @@
     </script>
     
     <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="floating-donation" title="Support Echo Music">
+        <img id="random-animal-gif" src="" alt="" class="donation-animal-gif">
         <i class="fas fa-heart"></i> Support
     </a>
+    <script>
+        (function() {
+            const gifImg = document.getElementById('random-animal-gif');
+            if (gifImg) {
+                const randomNum = Math.floor(Math.random() * 7) + 1;
+                gifImg.src = `cartoons/${randomNum}.gif`;
+            }
+        })();
+    </script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

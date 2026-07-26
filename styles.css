@@ -452,7 +452,22 @@ body {
 }
 
 .floating-donation i {
-    color: var(--accent); /* Red heart */
+    color: #ff4757; /* Red heart */
+}
+
+.donation-animal-gif {
+    position: absolute;
+    bottom: calc(100% - 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    height: 55px;
+    width: auto;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+.floating-donation:hover .donation-animal-gif {
+    transform: translate(-50%, -5px);
 }
 
 .floating-donation:hover {
@@ -1409,6 +1424,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh;
     padding-top: 60px; /* offset for top bar */
     text-align: center;
 }
