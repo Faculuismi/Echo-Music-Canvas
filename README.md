@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="App Logo/echo.png" alt="Echo Music Logo" width="120" height="120" style="border-radius: 24px;" />
+  <img src="https://raw.githubusercontent.com/EchoMusicApp/Echo-Music/main/assets/Echo-new.png" alt="Echo Music Logo" width="120" height="120"" />
 </p>
 
 <h1 align="center">Echo Music Canvas</h1>
